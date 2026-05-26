@@ -40,6 +40,30 @@ docker build -t dirtycow-lab .
 docker run --rm -it dirtycow-lab
 ```
 
+CI and local checks
+-------------------
+
+This repository includes a GitHub Actions workflow at `.github/workflows/ci.yml` that runs static checks on push/PR to `main`:
+
+- Python: `black --check` and `flake8` on `generate_presentation.py` (workflow fails on issues)
+- Shell: `shellcheck` on `run_demo.sh`
+- Dockerfile: `hadolint` on `Dockerfile`
+- C static analysis: `cppcheck` on `dirtyc0w.c` (analysis only; the workflow does NOT compile or run exploit code)
+
+Run the same checks locally:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install flake8 black
+black --check generate_presentation.py
+flake8 generate_presentation.py
+sudo apt-get update && sudo apt-get install -y shellcheck cppcheck
+shellcheck run_demo.sh
+cppcheck --enable=warning,style dirtyc0w.c
+```
+
+If you'd like, I can auto-format `generate_presentation.py` with `black` and apply fixes for the linter warnings in a follow-up change.
+
 ---
 
 ## 5. Under-the-Hood Exploit Flow

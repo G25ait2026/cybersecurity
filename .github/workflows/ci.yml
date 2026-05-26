@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install linters
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black
+      - name: Run black (check only)
+        run: black --check generate_presentation.py
+      - name: Run flake8 on repository scripts
+        run: flake8 generate_presentation.py
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shellcheck run_demo.sh
+        uses: koalaman/shellcheck-action@master
+        with:
+          files: run_demo.sh
+
+  hadolint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Dockerfile with hadolint
+        uses: hadolint/hadolint-action@v2
+        with:
+          dockerfile: Dockerfile
+
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+      - name: Static analyze C files (no build/run)
+        run: cppcheck --enable=warning,style dirtyc0w.c
