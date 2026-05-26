@@ -9,7 +9,6 @@ RUN apt-get update && apt-get install -y \
     gcc \
     libc6-dev \
     make \
-    pthread-w32 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
